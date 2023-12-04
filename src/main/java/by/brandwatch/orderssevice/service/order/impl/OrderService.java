@@ -23,8 +23,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+/**
+ * Service class for managing order-related operations.
+ */
 @Service
 public class OrderService implements IOrderService {
+
     private final OrderRepository orderRepository;
     private final OrderConverter orderConverter;
     private final ProductRepository productRepository;
@@ -42,6 +46,13 @@ public class OrderService implements IOrderService {
         this.productRepository = productRepository;
     }
 
+    /**
+     * Retrieves an order by its identifier.
+     *
+     * @param id The identifier of the order.
+     * @return OrderViewDto representing the order.
+     * @throws EntitiesNotFoundByIdsException If the order with the specified ID is not found.
+     */
     public OrderViewDto getOrder(Long id) throws EntitiesNotFoundByIdsException {
         Optional<OrderEntity> orderEntity = this.orderRepository.findById(id);
         if (orderEntity.isPresent()) {
@@ -51,6 +62,13 @@ public class OrderService implements IOrderService {
         }
     }
 
+    /**
+     * Retrieves orders by their identifiers.
+     *
+     * @param ids Set of order identifiers.
+     * @return List of OrderViewDto representing the orders.
+     * @throws EntitiesNotFoundByIdsException If any of the specified orders are not found.
+     */
     public List<OrderViewDto> getOrders(Set<Long> ids) throws EntitiesNotFoundByIdsException {
         if (this.orderRepository.existsAllByIdIn(ids)) {
             return this.orderConverter.convertToDto(this.orderRepository.findAllByIdIn(ids));
@@ -59,6 +77,12 @@ public class OrderService implements IOrderService {
         }
     }
 
+    /**
+     * Creates a new order.
+     *
+     * @param orderDto Information about the new order in the form of OrderDto.
+     * @return OrderViewDto representing the created order.
+     */
     @Transactional
     public OrderViewDto createOrder(OrderDto orderDto) {
         OrderEntity orderEntity = this.getOrderEntity(orderDto, this.getLocalTime(), false);
@@ -66,11 +90,19 @@ public class OrderService implements IOrderService {
         return this.orderConverter.convertToViewDto(savedOrderEntity);
     }
 
+    /**
+     * Updates information about an existing order.
+     *
+     * @param id      Identifier of the order to be updated.
+     * @param orderDto Information about the order in the form of OrderDto.
+     * @return OrderViewDto representing the updated order.
+     * @throws EntitiesNotFoundByIdsException If the order with the specified ID is not found.
+     */
     @Transactional
     public OrderViewDto updateOrder(Long id, OrderDto orderDto) {
         Optional<OrderEntity> existsOrderEntity = this.orderRepository.findById(id);
         if (existsOrderEntity.isEmpty()) {
-        throw new EntitiesNotFoundByIdsException(List.of(id), this.ENTITY_NAME);
+            throw new EntitiesNotFoundByIdsException(List.of(id), this.ENTITY_NAME);
         } else {
             OrderEntity orderEntity = this.getOrderEntity(orderDto, existsOrderEntity.get().getOrderDate(), existsOrderEntity.get().isCompleted());
             orderEntity.setId(id);
@@ -79,6 +111,12 @@ public class OrderService implements IOrderService {
         }
     }
 
+    /**
+     * Searches for orders based on the provided criteria.
+     *
+     * @param orderSearchDto The criteria for searching orders.
+     * @return Page of OrderViewDto representing the search results.
+     */
     @Override
     public Page<OrderViewDto> searchOrders(OrderSearchDto orderSearchDto) {
         Pageable pageable;
@@ -113,7 +151,6 @@ public class OrderService implements IOrderService {
                 isCompleted
         );
     }
-
 
     private String getLocalTime() {
         LocalDateTime now = LocalDateTime.now();

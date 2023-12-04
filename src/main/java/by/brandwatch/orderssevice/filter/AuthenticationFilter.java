@@ -42,16 +42,10 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException, UnauthorizedException {
-        try {
-            String jwtToken = extractJwtToken(request);
-            HttpEntity<String> requestEntity = this.createRequestEntity(jwtToken);
-            restTemplate.postForObject(validationUrl, requestEntity, Void.class);
-            filterChain.doFilter(request, response);
-
-        } catch (UnauthorizedException e) {
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.getWriter().write(e.getStatusText());
-        }
+        String jwtToken = extractJwtToken(request);
+        HttpEntity<String> requestEntity = this.createRequestEntity(jwtToken);
+        restTemplate.postForObject(validationUrl, requestEntity, Void.class);
+        filterChain.doFilter(request, response);
     }
 
     @Override
@@ -76,15 +70,15 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String findKeyURI(String fullPath) {
-        for (String key: this.UNSECURE_ENDPOINTS.keySet()){
-            if (fullPath.contains(key)){
+        for (String key : this.UNSECURE_ENDPOINTS.keySet()) {
+            if (fullPath.contains(key)) {
                 return key;
             }
         }
         return null;
     }
 
-    private HttpEntity<String> createRequestEntity (String jwtToken) {
+    private HttpEntity<String> createRequestEntity(String jwtToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + jwtToken);
         return new HttpEntity<>(headers);

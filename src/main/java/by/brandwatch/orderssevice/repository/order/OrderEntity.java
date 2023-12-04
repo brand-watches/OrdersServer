@@ -9,6 +9,7 @@ import java.util.List;
 @Entity(name = "orders")
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 @Getter
 @Setter
 public class OrderEntity {

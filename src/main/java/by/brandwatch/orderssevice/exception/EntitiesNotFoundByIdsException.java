@@ -1,12 +1,15 @@
 package by.brandwatch.orderssevice.exception;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
 
-public class EntitiesNotFoundByIdsException extends HttpClientErrorException {
+
+@ResponseStatus(value = HttpStatus.NOT_FOUND)
+public class EntitiesNotFoundByIdsException extends RuntimeException {
     public EntitiesNotFoundByIdsException(List<Long> invalidIds, String name) {
-        super(HttpStatus.NOT_FOUND, "Invalid Ids " + name + ": " + invalidIds.toString());
+        super("Invalid Ids " + name + ": " + invalidIds.toString());
     }
 }

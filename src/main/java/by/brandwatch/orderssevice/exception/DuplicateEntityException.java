@@ -1,11 +1,13 @@
 package by.brandwatch.orderssevice.exception;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
-public class DuplicateEntityException extends HttpClientErrorException {
+@ResponseStatus(value = HttpStatus.CONFLICT)
+public class DuplicateEntityException extends RuntimeException {
 
     public DuplicateEntityException(String entityName) {
-        super(HttpStatus.CONFLICT, "Duplicate entity: " + entityName);
+        super("Duplicate entity: " + entityName);
     }
 }
